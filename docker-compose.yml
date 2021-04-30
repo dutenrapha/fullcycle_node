@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+    node:
+        build:
+            context: ./app
+        image: dutenrapha/node
+        container_name: app
+        entrypoint: dockerize -wait tcp://db:3306 -timeout 40s docker-entrypoint.sh
+        #restart: always
+        tty: true
+        ports:
+            - "3000:3000"
+        networks: 
+            - node-network
+        depends_on: 
+            - db
+
+    db:
+        image: mysql:5.7
+        command: --innodb-use-native-aio=0
+        container_name: db
+        networks: 
+            - node-network
+        restart: always
+        tty: true
+        volumes: 
+            - ./mysql/db:/var/lib/mysql
+            - ./mysql/init:/docker-entrypoint-initdb.d/
+        environment: 
+            - MYSQL_DATABASE=nodedb
+            - MYSQL_ROOT_PASSWORD=root
+
+    nginx:
+        build:
+            context: ./nginx
+        image: dutenrapha/nginx
+        container_name: nginx
+        restart: always
+        ports:
+            - "8080:80"
+        networks: 
+            - node-network
+
+networks:
+    node-network:
+        driver: bridge
+ 
