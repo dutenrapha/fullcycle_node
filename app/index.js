@@ -12,12 +12,17 @@ const config = {
 const mysql = require('mysql')
 const connection = mysql.createConnection(config)
 
-const sql = `INSERT INTO people(name) values('João')`
-connection.query(sql)
+const sql_insert = `INSERT INTO people(name) values('João')`
+connection.query(sql_insert)
 connection.end()
 
 app.get('/', (req, res) => {
-    res.send('<h1>Full cycle RockkS!!!!!!</h1>')
+    res.send('<h1>Full cycle Rocks!</h1>')
+    
+    connection.query('SELECT name FROM people', (err, rows) => {
+        if(err) throw err
+        console.log(rows);
+      }).end();
 })
 
 app.listen(port, () => {
