@@ -10,19 +10,22 @@ const config = {
 }
 
 const mysql = require('mysql')
-const connection = mysql.createConnection(config)
+let connection = mysql.createConnection(config)
 
 const sql_insert = `INSERT INTO people(name) values('João')`
 connection.query(sql_insert)
 connection.end()
 
 app.get('/', (req, res) => {
-    res.send('<h1>Full cycle Rocks!</h1>')
     
+    connection = mysql.createConnection(config)
     connection.query('SELECT name FROM people', (err, rows) => {
         if(err) throw err
-        console.log(rows);
-      }).end();
+        console.log(rows[0].name);
+        var header = '<h1>Full cycle Rocks!</h1> </br> - '
+        res.send(header.concat(rows[0].name))
+      })
+    
 })
 
 app.listen(port, () => {
